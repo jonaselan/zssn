@@ -7,4 +7,5 @@ FactoryGirl.define do
     latitude { Faker::Address.latitude }
     infected false
     infection_occurrences 0
+  end
 end

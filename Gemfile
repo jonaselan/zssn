@@ -31,7 +31,8 @@ group :development, :test do
 
   gem 'factory_girl_rails'
   gem 'rspec-rails'
-
+  # generates names, email addresses, and other placeholders for factories.
+  gem 'faker'
   # for cleaner the db after test
   gem 'database_cleaner'
   # to facilitate the test related with association and validation
@@ -44,8 +45,6 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
-  # generates names, email addresses, and other placeholders for factories.
-  gem 'faker'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

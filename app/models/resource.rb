@@ -1,4 +1,6 @@
 class Resource < ApplicationRecord
-  has_many :inventory_resouces
+  has_many :inventory_resources
   has_many :inventories, through: :inventory_resources
+  
+  enum name: [:water, :food, :medication, :ammunition]
 end

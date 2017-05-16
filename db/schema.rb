@@ -30,7 +30,7 @@ ActiveRecord::Schema.define(version: 20170516155511) do
 
   create_table "resources", force: :cascade do |t|
     t.integer  "point"
-    t.string   "name"
+    t.integer  "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
