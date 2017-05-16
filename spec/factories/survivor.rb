@@ -8,9 +8,22 @@ FactoryGirl.define do
     infected false
     infection_occurrences 0
 
-    trait :infected_person do
+    factory :infected_person do
       infected true
       infection_occurrences 3
     end
+
+    trait :without_inventory do
+      after :create do |survivor|
+        survivor.inventory = nil
+      end
+    end
+
+    trait :with_inventory do
+      after :create do |ss|
+        create :inventory_with_resources, survivor_id: ss.id
+      end
+    end
+
   end
 end
