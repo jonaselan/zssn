@@ -1,5 +1,15 @@
 class SurvivorsController < ApplicationController
-  before_action :get_survivor, only: [:show, :update, :destroy]
+  before_action :get_survivor, only: [:show, :update, :destroy, :report_infection]
+
+  def report_infection
+    unless @survivor.infected
+      @survivor.report_infection
+      @survivor.save
+      render json: { message:  "Flag the survivor!"}
+    else
+      render json: { message:  "Already dead :("}
+    end
+  end
 
   def index
     @survivors = Survivor.all
