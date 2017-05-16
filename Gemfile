@@ -28,6 +28,15 @@ gem 'puma', '~> 3.0'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
+
+  gem 'factory_girl_rails'
+  gem 'rspec-rails'
+
+  # for cleaner the db after test
+  gem 'database_cleaner'
+  # to facilitate the test related with association and validation
+  gem 'shoulda-matchers', require: false
+  gem 'rails-controller-testing'
 end
 
 group :development do
@@ -35,6 +44,8 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  # generates names, email addresses, and other placeholders for factories.
+  gem 'faker'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
