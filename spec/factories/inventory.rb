@@ -8,7 +8,13 @@ FactoryGirl.define do
       end
 
       after(:create) do |inventory, evaluator|
-        create_list(:inventory_with_medication, evaluator.resource_count, inventory: inventory)
+        create_list(:inventory_with_water, evaluator.resource_count, inventory: inventory)
+      end
+    end
+
+    factory :inventory_with_many_resources do
+      after(:create) do |inventory|
+        create_list(:inventory_with_medication, 2, inventory: inventory)
       end
     end
 

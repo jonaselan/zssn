@@ -8,7 +8,7 @@ FactoryGirl.define do
     infected false
     infection_occurrences 0
 
-    factory :infected_person do
+    trait :infected_person do
       infected true
       infection_occurrences 3
     end
@@ -25,5 +25,10 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_many_resources do
+      after :create do |ss|
+        create :inventory_with_many_resources, survivor_id: ss.id
+      end
+    end
   end
 end

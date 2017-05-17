@@ -11,18 +11,18 @@ class ReportsController < ApplicationController
       percentage: Survivor.avg_non_infected
     }
   end
-  def avg_item_per_person
+  def avg_resource_per_person
     render json: {
-      description: "Average of items per person",
-      avg_ammunition: Survivor.avg_item_per_person(1),
-      avg_medication: Survivor.avg_item_per_person(2),
-      avg_food: Survivor.avg_item_per_person(3),
-      avg_water: Survivor.avg_item_per_person(4),
+      description: "Average of resources per person",
+      avg_ammunition: Survivor.avg_resource_per_person(1),
+      avg_medication: Survivor.avg_resource_per_person(2),
+      avg_food: Survivor.avg_resource_per_person(3),
+      avg_water: Survivor.avg_resource_per_person(4),
     }
   end
   def points_lost_infected
     render json: {
-      description: "Total points lost in items that belong to infected people",
+      description: "Total points lost in resources that belong to infected people",
       number: Survivor.points_lost_infected
     }
   end

@@ -7,8 +7,6 @@ class Survivor < ApplicationRecord
   validates :name, :age, :gender, :longitude, :latitude, presence: true
   validates :name, uniqueness: true
 
-  # validates :inventory, presence: true
-
   scope :all_peoples, -> { all }
   scope :infected_peoples, -> { where("infected = ?", true) }
   scope :no_infected_peoples, -> { where("infected = ?", false) }
@@ -16,6 +14,17 @@ class Survivor < ApplicationRecord
   def report_infection
     self.infection_occurrences += 1
     infect if infections_rate_reached?
+  end
+
+  def do_the_trade_with(other, resources)
+    resources.split(',').each do |r|
+      values = r.split(':')
+      (values[0].to_i).times do |t|
+        resource = Resource.by_name(values[1])
+        other.inventory.inventory_resources.create(resource: resource)
+        InventoryResource.where(resource: resource, inventory: self.inventory).first.destroy
+      end
+    end
   end
 
   def self.avg_infected
@@ -26,8 +35,8 @@ class Survivor < ApplicationRecord
     (no_infected_peoples.count.to_f / all_peoples.count.to_f)*100
   end
 
-  def self.avg_item_per_person(id)
-    count_item_in_inventory(id) / all_peoples.count.to_f
+  def self.avg_resource_per_person(id)
+    count_resource_in_inventory(id) / all_peoples.count.to_f
   end
 
   def self.points_lost_infected
@@ -44,7 +53,7 @@ class Survivor < ApplicationRecord
     self.infected = true
   end
 
-  def self.count_item_in_inventory(id)
+  def self.count_resource_in_inventory(id)
     InventoryResource.where(resource_id: id).count
   end
 

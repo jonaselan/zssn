@@ -1,19 +1,64 @@
 require 'rails_helper'
 
 RSpec.describe SurvivorsController, type: :controller do
+  let(:convert_response) { JSON.parse(response.body).with_indifferent_access }
+
   describe 'GET #report_infection' do
     it "return successful message when add occurrence" do
       survivor = create(:survivor, infection_occurrences: 1)
       get :report_infection, params: { id: survivor.id }
-      answer = JSON.parse(response.body).with_indifferent_access
+      answer = convert_response
       expect(answer['message']).to eq 'Flag the survivor!'
     end
     it "return message warning the person already dead" do
-      person = create(:infected_person)
+      person = create(:survivor, :infected_person)
       get :report_infection, params: { id: person.id }
-      answer = JSON.parse(response.body).with_indifferent_access
+      answer = convert_response
       expect(answer['message']).to eq 'Already dead :('
     end
+  end
+
+  describe 'GET #trade' do
+    let(:survivor_with_inventory) { create(:survivor, :with_inventory) }
+    before :each do
+      @survivor = survivor_with_inventory
+    end
+
+    context "is invalid" do
+      it "with one infected person" do
+        survivor = create(:survivor, :infected_person)
+        get :trade, params: { survivor1_id: @survivor, resources1: '1:medication', survivor2_id: survivor, resources2: '2:medication' }
+        answer = convert_response
+        expect(answer['message']).to eq("Resource's points don't match or exist one person infected")
+      end
+      it "with no match points between survivors" do
+        survivor = survivor_with_inventory
+        get :trade, params: { survivor1_id: @survivor, resources1: '1:medication', survivor2_id: survivor, resources2: '2:medication' }
+        answer = convert_response
+        expect(answer['message']).to eq("Resource's points don't match or exist one person infected")
+      end
+      it "when try make a trade with survivor non-existent" do
+        get :trade, params: { survivor1_id: 5, resources1: '1:medication', survivor2_id: 4, resources2: '2:medication' }
+        answer = convert_response
+        expect(answer['message']).to eq("Survivor don't exist")
+      end
+      # it "when try make a trade with resource non-existent related with survivor" do
+      #   survivor = survivor_with_inventory
+      #   get :trade, params: { survivor1_id: @survivor, resources1: '4:ammunition', survivor2_id: survivor, resources2: '1:water' }
+      #   answer = convert_response
+      #   expect(answer['message']).to eq("Resource don't found")
+      # end
+    end
+
+    context 'is valid' do
+      # it "when obey the conditions" do
+      #   survivor = create(:survivor, :with_many_resources)
+      #   get :trade, params: { survivor1_id: @survivor, resources1: '1:water', survivor2_id: survivor, resources2: '2:medication' }
+      #   answer = JSON.parse(response.body).with_indifferent_access
+      #   expect(answer['message']).to eq("Trade finished!")
+      # end
+    end
+
   end
 
   describe 'POST #create' do
@@ -29,7 +74,7 @@ RSpec.describe SurvivorsController, type: :controller do
                                   	  	}]
                                       }
                                   }
-                              
+
       end
 
       let(:survivor) { Survivor.first }
@@ -38,7 +83,7 @@ RSpec.describe SurvivorsController, type: :controller do
       let(:survivor_inventory_resources) { survivor.inventory.inventory_resources }
 
       it 'render the value save' do
-        answer = JSON.parse(response.body).with_indifferent_access
+        answer = convert_response
         expect(answer.as_json.first(7)).to eq(assigns(:survivor).as_json.first(7))
       end
 
@@ -57,13 +102,13 @@ RSpec.describe SurvivorsController, type: :controller do
       it "creates resources related with survivor's inventory" do
         expect(survivor_resources.first.name).to match 'ammunition'
       end
-
-      # TODO
-      # context 'without valid attributes' do
-      #   it 'does not save the survivor in db' do
-      #   end
-      # end
     end
+
+    # TODO
+    # context 'without valid attributes' do
+    #   it 'does not save the survivor without invetory' do
+    #   end
+    # end
   end
 
   describe 'GET #index' do
