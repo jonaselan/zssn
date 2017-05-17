@@ -7,9 +7,11 @@ class Survivor < ApplicationRecord
   validates :name, :age, :gender, :longitude, :latitude, presence: true
   validates :name, uniqueness: true
 
-  scope :all_peoples, -> {all}
-  scope :infected_peoples, -> {where("infected = ?", true)}
-  scope :no_infected_peoples, -> {where("infected = ?", false)}
+  # validates :inventory, presence: true
+
+  scope :all_peoples, -> { all }
+  scope :infected_peoples, -> { where("infected = ?", true) }
+  scope :no_infected_peoples, -> { where("infected = ?", false) }
 
   def report_infection
     self.infection_occurrences += 1

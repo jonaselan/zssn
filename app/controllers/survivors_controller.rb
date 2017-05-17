@@ -48,11 +48,9 @@ class SurvivorsController < ApplicationController
     end
 
     def survivor_params
-      params.require(:survivor)
-            .permit(:name, :age, :gender, :latitude, :longitude, :infected, :infection_occurrences,
-                      inventory_attributes:
-                      [
-                        inventory_resources_attributes: [
+      params.permit(:name, :age, :gender, :latitude, :longitude, :infected, :infection_occurrences,
+                      inventory_attributes: [
+                        inventory_resources_attributes: [ 
                           :resource_id
                         ]
                       ]

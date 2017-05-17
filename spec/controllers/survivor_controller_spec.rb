@@ -18,21 +18,44 @@ RSpec.describe SurvivorsController, type: :controller do
 
   describe 'POST #create' do
     context 'with valid attributes' do
-      it 'save the new survivors in the db' do
-        expect {
-          post :create, params: attributes_for(:survivor)
-        }.to change(Survivor, :count).by(1)
+      before :each do
+        resouce = create(:resource_ammunition)
+        post :create, params:
+                                  { name: 'Survivor', age: 3, gender: true, latitude: '35.202828',
+                                    longitude: '5.811593', infected: false, infection_occurrences: 0,
+                                      inventory_attributes: {
+                                        inventory_resources_attributes: [{
+                                  	  		resource_id: resouce.id
+                                  	  	}]
+                                      }
+                                  }
+                              
       end
 
+      let(:survivor) { Survivor.first }
+      let(:survivor_inventory) { survivor.inventory }
+      let(:survivor_resources) { survivor.inventory.resources }
+      let(:survivor_inventory_resources) { survivor.inventory.inventory_resources }
+
       it 'render the value save' do
-        post :create, params: attributes_for(:survivor)
         answer = JSON.parse(response.body).with_indifferent_access
         expect(answer.as_json.first(7)).to eq(assigns(:survivor).as_json.first(7))
       end
 
       it 'get 201 status' do
-        post :create, params: attributes_for(:survivor)
         expect(response.status).to eq 201
+      end
+
+      it 'save the new survivors in the db' do
+        expect(Survivor.count).to eq 1
+      end
+
+      it 'creates a inventory related with survivor' do
+        expect(survivor_inventory).to match Inventory.first
+      end
+
+      it "creates resources related with survivor's inventory" do
+        expect(survivor_resources.first.name).to match 'ammunition'
       end
 
       # TODO
@@ -64,6 +87,7 @@ RSpec.describe SurvivorsController, type: :controller do
   end
 
   describe 'PATCH #update' do
+    let (:reload) { @survivor.reload }
     before :each do
       @survivor = create(:survivor,
       latitude: '-16.346867430278824',
@@ -71,7 +95,6 @@ RSpec.describe SurvivorsController, type: :controller do
       name: 'Zezé',
       age: 20)
     end
-    let (:reload) { @survivor.reload }
 
     context 'valid attributes' do
       it "change the survivor's location" do
