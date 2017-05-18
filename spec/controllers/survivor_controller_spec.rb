@@ -18,47 +18,69 @@ RSpec.describe SurvivorsController, type: :controller do
     end
   end
 
-  describe 'GET #trade' do
+  describe 'PUT #trade' do
     let(:survivor_with_inventory) { create(:survivor, :with_inventory) }
-    before :each do
-      @survivor = survivor_with_inventory
-    end
 
     context "is invalid" do
+      before :each do
+        @survivor = survivor_with_inventory
+      end
       it "with one infected person" do
         survivor = create(:survivor, :infected_person)
-        get :trade, params: { survivor1_id: @survivor, resources1: '1:medication', survivor2_id: survivor, resources2: '2:medication' }
+        put :trade, params: { survivor1_id: @survivor, resources1: '1:medication', survivor2_id: survivor, resources2: '2:medication' }
         answer = convert_response
         expect(answer['message']).to eq("Resource's points don't match or exist one person infected")
       end
       it "with no match points between survivors" do
         survivor = survivor_with_inventory
-        get :trade, params: { survivor1_id: @survivor, resources1: '1:medication', survivor2_id: survivor, resources2: '2:medication' }
+        put :trade, params: { survivor1_id: @survivor, resources1: '1:medication', survivor2_id: survivor, resources2: '2:medication' }
         answer = convert_response
         expect(answer['message']).to eq("Resource's points don't match or exist one person infected")
       end
       it "when try make a trade with survivor non-existent" do
-        get :trade, params: { survivor1_id: 5, resources1: '1:medication', survivor2_id: 4, resources2: '2:medication' }
+        put :trade, params: { survivor1_id: 5, resources1: '1:medication', survivor2_id: 4, resources2: '2:medication' }
         answer = convert_response
-        expect(answer['message']).to eq("Survivor don't exist")
+        expect(answer['message']).to eq("Survivor not exist")
       end
-      # it "when try make a trade with resource non-existent related with survivor" do
-      #   survivor = survivor_with_inventory
-      #   get :trade, params: { survivor1_id: @survivor, resources1: '4:ammunition', survivor2_id: survivor, resources2: '1:water' }
-      #   answer = convert_response
-      #   expect(answer['message']).to eq("Resource don't found")
-      # end
+      it "when try make a trade with survivor's resource non-existent" do
+        survivor = create(:survivor, :inventory_empty)
+        put :trade, params: { survivor1_id: @survivor, resources1: '2:water', survivor2_id: survivor, resources2: '4:medication' }
+        answer = convert_response
+        expect(answer['message']).to eq("Resource not found")
+      end
     end
 
     context 'is valid' do
-      # it "when obey the conditions" do
-      #   survivor = create(:survivor, :with_many_resources)
-      #   get :trade, params: { survivor1_id: @survivor, resources1: '1:water', survivor2_id: survivor, resources2: '2:medication' }
-      #   answer = JSON.parse(response.body).with_indifferent_access
-      #   expect(answer['message']).to eq("Trade finished!")
-      # end
-    end
+      before do
+        @survivor1 = create(:survivor, :inventory_empty)
+        @res1 = create(:resource_water)
+        @survivor1.inventory.inventory_resources.create(resource: @res1)
 
+        @survivor2 = create(:survivor, :inventory_empty)
+        @res2 = create(:resource_food)
+        @res3 = create(:resource_ammunition)
+        @survivor2.inventory.inventory_resources.create(resource: @res2)
+        @survivor2.inventory.inventory_resources.create(resource: @res3)
+
+        put :trade, params: { survivor1_id: @survivor1.id, resources1: '1:water', survivor2_id: @survivor2.id, resources2: '1:food,1:ammunition' }
+      end
+      it "when both obey the conditions" do
+        answer = JSON.parse(response.body).with_indifferent_access
+        expect(answer['message']).to eq("Trade finished!")
+      end
+      context 'survivor which gives the resource' do
+        it "it must have the resource deleted from its inventory" do
+          expect(@survivor1.inventory.resources).to_not contain_exactly(@res1)
+          expect(@survivor2.inventory.resources).to_not contain_exactly(@res2)
+        end
+      end
+      context 'survivor which receives the resource' do
+        it 'must have the resource given by the trade on its inventory' do
+          expect(@survivor1.inventory.resources).to contain_exactly(@res2, @res3)
+          expect(@survivor2.inventory.resources).to contain_exactly(@res1)
+        end
+      end
+    end
   end
 
   describe 'POST #create' do
@@ -66,14 +88,14 @@ RSpec.describe SurvivorsController, type: :controller do
       before :each do
         resouce = create(:resource_ammunition)
         post :create, params:
-                                  { name: 'Survivor', age: 3, gender: true, latitude: '35.202828',
-                                    longitude: '5.811593', infected: false, infection_occurrences: 0,
-                                      inventory_attributes: {
-                                        inventory_resources_attributes: [{
-                                  	  		resource_id: resouce.id
-                                  	  	}]
-                                      }
-                                  }
+                            { name: 'Survivor', age: 3, gender: true, latitude: '35.202828',
+                              longitude: '5.811593', infected: false, infection_occurrences: 0,
+                                inventory_attributes: {
+                                  inventory_resources_attributes: [{
+                            	  		resource_id: resouce.id
+                            	  	}]
+                                }
+                            }
 
       end
 
@@ -86,29 +108,19 @@ RSpec.describe SurvivorsController, type: :controller do
         answer = convert_response
         expect(answer.as_json.first(7)).to eq(assigns(:survivor).as_json.first(7))
       end
-
       it 'get 201 status' do
         expect(response.status).to eq 201
       end
-
       it 'save the new survivors in the db' do
         expect(Survivor.count).to eq 1
       end
-
       it 'creates a inventory related with survivor' do
         expect(survivor_inventory).to match Inventory.first
       end
-
       it "creates resources related with survivor's inventory" do
         expect(survivor_resources.first.name).to match 'ammunition'
       end
     end
-
-    # TODO
-    # context 'without valid attributes' do
-    #   it 'does not save the survivor without invetory' do
-    #   end
-    # end
   end
 
   describe 'GET #index' do
@@ -124,10 +136,16 @@ RSpec.describe SurvivorsController, type: :controller do
   end
 
   describe 'GET #show' do
+    before do
+      @survivor = create(:survivor)
+    end
+
     it "assigns the requested survivor to @survivor" do
-      survivor = create(:survivor)
-      get :show, params: { id: survivor.id }
+      get :show, params: { id: @survivor.id }
       expect(assigns(:survivor)).to be_a(Survivor)
+    end
+    it 'is invalid when try show nonexist survivor' do
+      expect { get :show, params: {id: 2}  }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
@@ -152,14 +170,12 @@ RSpec.describe SurvivorsController, type: :controller do
         patch :update, params: { id: @survivor.id, survivor: attributes_for(:survivor) }
         expect(assigns(:survivor)).to eq(@survivor)
       end
-
       it "changes @survivor's attributes" do
         patch :update, params: { id: @survivor.id, name: 'Chico', age: 21 }
         reload
         expect(@survivor.name).to eq('Chico')
         expect(@survivor.age).to eq(21)
       end
-
       it 'get 200 status' do
         patch :update, params: { id: @survivor.id, survivor: attributes_for(:survivor) }
         expect(response.status).to eq(200) # Sucess
@@ -186,10 +202,12 @@ RSpec.describe SurvivorsController, type: :controller do
         delete :destroy, params: {id: @survivor.id}
       }.to change(Survivor, :count).by(-1)
     end
-
     it 'get status 204' do
       delete :destroy, params: {id: @survivor.id}
       expect(response.status).to eq 204 # No content
+    end
+    it 'is invalid when try delete nonexist survivor' do
+      expect { delete :destroy, params: {id: 2}  }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 

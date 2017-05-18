@@ -7,8 +7,14 @@ RSpec.describe ReportsController, type: :controller do
   end
 
   let(:create_survivors_with_resources) do
-    create(:survivor, :infected_person, :with_inventory)
-    create(:survivor, :with_inventory)
+    surv = create(:survivor, :inventory_empty)
+    person_infected = create(:survivor, :infected_person, :inventory_empty)
+
+    am = create(:resource_ammunition)
+    water = create(:resource_ammunition)
+
+    surv.inventory.inventory_resources.create(resource: water)
+    person_infected.inventory.inventory_resources.create(resource: am)
   end
 
   describe 'GET #avg_infected' do
@@ -34,10 +40,10 @@ RSpec.describe ReportsController, type: :controller do
       create_survivors_with_resources
       get :avg_resource_per_person
       answer = JSON.parse(response.body).with_indifferent_access
-      expect(answer['avg_ammunition']).to eq(0.0)
+      expect(answer['avg_ammunition']).to eq(0.5)
       expect(answer['avg_medication']).to eq(0.5)
       expect(answer['avg_food']).to eq(0.0)
-      expect(answer['avg_water']).to eq(0.5)
+      expect(answer['avg_water']).to eq(0)
     end
   end
 
@@ -46,7 +52,7 @@ RSpec.describe ReportsController, type: :controller do
       create_survivors_with_resources
       get :points_lost_infected
       answer = JSON.parse(response.body).with_indifferent_access
-      expect(answer['number']).to eq(4)
+      expect(answer['number']).to eq(1)
     end
   end
 end

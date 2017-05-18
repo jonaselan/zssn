@@ -30,5 +30,12 @@ FactoryGirl.define do
         create :inventory_with_many_resources, survivor_id: ss.id
       end
     end
+
+    trait :inventory_empty do
+      after :create do |ss|
+        create :inventory, survivor_id: ss.id
+      end
+    end
+
   end
 end

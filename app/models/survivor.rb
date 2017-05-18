@@ -7,9 +7,9 @@ class Survivor < ApplicationRecord
   validates :name, :age, :gender, :longitude, :latitude, presence: true
   validates :name, uniqueness: true
 
-  scope :all_peoples, -> { all }
-  scope :infected_peoples, -> { where("infected = ?", true) }
-  scope :no_infected_peoples, -> { where("infected = ?", false) }
+  scope :all_people, -> { all }
+  scope :infected_people, -> { where("infected = ?", true) }
+  scope :no_infected_people, -> { where("infected = ?", false) }
 
   def report_infection
     self.infection_occurrences += 1
@@ -28,19 +28,19 @@ class Survivor < ApplicationRecord
   end
 
   def self.avg_infected
-    (infected_peoples.count.to_f / all_peoples.count.to_f)*100
+    (infected_people.count.to_f / all_people.count.to_f)*100
   end
 
   def self.avg_non_infected
-    (no_infected_peoples.count.to_f / all_peoples.count.to_f)*100
+    (no_infected_people.count.to_f / all_people.count.to_f)*100
   end
 
   def self.avg_resource_per_person(id)
-    count_resource_in_inventory(id) / all_peoples.count.to_f
+    count_resource_in_inventory(id) / all_people.count.to_f
   end
 
   def self.points_lost_infected
-    number_points_of(infected_peoples)
+    number_points_of(infected_people)
   end
 
   private
@@ -57,9 +57,9 @@ class Survivor < ApplicationRecord
     InventoryResource.where(resource_id: id).count
   end
 
-  def self.number_points_of(peoples)
+  def self.number_points_of(people)
     points = 0
-    peoples.map { |p|
+    people.map { |p|
       p.inventory.resources.map { |r|
         points += r.point
       }

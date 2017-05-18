@@ -15,7 +15,7 @@ class SurvivorsController < ApplicationController
     begin
       data = info_trade
     rescue ActiveRecord::RecordNotFound
-      return render json: { message: "Survivor don't exist" }
+      return render json: { message: "Survivor not exist" }
     end
 
     begin
@@ -26,7 +26,7 @@ class SurvivorsController < ApplicationController
         render json: { message: "Resource's points don't match or exist one person infected" }, status: 400
       end
     rescue NoMethodError
-      render json: { message: "Resource don't found" }
+      render json: { message: "Resource not found" }
     end
 
   end

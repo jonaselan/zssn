@@ -1,2 +1,2 @@
 # zssn
-System for help non-infected peoples to share resources
+System for help non-infected people to share resources
