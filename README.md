@@ -1,4 +1,4 @@
-ZSSN (Zombie Survival Social Network)
+# ZSSN (Zombie Survival Social Network)
 
 System for help non-infected people to share resources
 
@@ -8,6 +8,7 @@ System for help non-infected people to share resources
 * [Rails](http://rubyonrails.org/)
 
 The application is deploy [here](https://www.heroku.com/). But if you are using locally, is important fill the default resources after the `rails db:migration` and `bundle`. For do that,  run:
+
 ```
 rails db:seed
 ```
