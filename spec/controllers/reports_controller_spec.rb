@@ -11,7 +11,7 @@ RSpec.describe ReportsController, type: :controller do
     person_infected = create(:survivor, :infected_person, :inventory_empty)
 
     am = create(:resource_ammunition)
-    water = create(:resource_ammunition)
+    water = create(:resource_water)
 
     surv.inventory.inventory_resources.create(resource: water)
     person_infected.inventory.inventory_resources.create(resource: am)
@@ -43,7 +43,7 @@ RSpec.describe ReportsController, type: :controller do
       expect(answer['avg_ammunition']).to eq(0.5)
       expect(answer['avg_medication']).to eq(0.5)
       expect(answer['avg_food']).to eq(0.0)
-      expect(answer['avg_water']).to eq(0)
+      expect(answer['avg_water']).to eq(0.0)
     end
   end
 

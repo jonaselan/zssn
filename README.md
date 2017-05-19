@@ -7,7 +7,7 @@ System for help non-infected people to share resources
 * [Ruby](https://www.ruby-lang.org) (2.3.0 used)
 * [Rails](http://rubyonrails.org/)
 
-The application is deploy [here](https://www.heroku.com/). But if you are using locally, is important fill the default resources after the `rails db:migration` and `bundle`. For do that,  run:
+The application is deploy [here](https://jonaselan-zssn.herokuapp.com/api/survivors). But if you are using locally, is important fill the default resources after the `rails db:migration` and `bundle`. For do that,  run:
 
 ```
 rails db:seed
@@ -32,12 +32,12 @@ api/survivors
   "infected": false,
   "infection_occurrences": 0,
   "inventory_attributes": {
-  		"inventory_resources_attributes": [{
-  			"resource_id": 1,
-    		"resource_id": 2,
-    		 ...
-  		 }]
-  	}
+  		"inventory_resources_attributes": [
+	  	    {"resource_id": 1 },
+		    {"resource_id": 2 },
+                   {...}
+	  	]
+  }
 }
 ```
 Follow this table of values for assignment the resource to survivor
@@ -69,7 +69,7 @@ Follow this table of values for assignment the resource to survivor
 
 **PUT** to trade items between survivors.
 ```
-api/survivors/{id}/trade/{survivor1_id}/{resources1}/{survivor2_id}/{resources2}
+api/survivors/trade/{survivor1_id}/{resources1}/{survivor2_id}/{resources2}
 
 ```
 

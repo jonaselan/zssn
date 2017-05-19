@@ -12,11 +12,14 @@
 
 ActiveRecord::Schema.define(version: 20170516155511) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "inventories", force: :cascade do |t|
     t.integer  "survivor_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
-    t.index ["survivor_id"], name: "index_inventories_on_survivor_id"
+    t.index ["survivor_id"], name: "index_inventories_on_survivor_id", using: :btree
   end
 
   create_table "inventory_resources", force: :cascade do |t|
@@ -24,8 +27,8 @@ ActiveRecord::Schema.define(version: 20170516155511) do
     t.integer  "resource_id"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
-    t.index ["inventory_id"], name: "index_inventory_resources_on_inventory_id"
-    t.index ["resource_id"], name: "index_inventory_resources_on_resource_id"
+    t.index ["inventory_id"], name: "index_inventory_resources_on_inventory_id", using: :btree
+    t.index ["resource_id"], name: "index_inventory_resources_on_resource_id", using: :btree
   end
 
   create_table "resources", force: :cascade do |t|
@@ -47,4 +50,7 @@ ActiveRecord::Schema.define(version: 20170516155511) do
     t.datetime "updated_at",            null: false
   end
 
+  add_foreign_key "inventories", "survivors"
+  add_foreign_key "inventory_resources", "inventories"
+  add_foreign_key "inventory_resources", "resources"
 end
