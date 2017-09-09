@@ -1,4 +1,7 @@
 class SurvivorsController < ApplicationController
+  include Swagger::Blocks
+  include Docs::SurvivorsController
+
   before_action :get_survivor, only: [:show, :update, :destroy, :report_infection]
 
   def report_infection

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :docs, only: [:index]
+
   scope 'api' do
     resources :survivors do
       collection do
