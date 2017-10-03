@@ -65,7 +65,6 @@ module Docs
             key :description, 'survivor response'
           end
         end
-        operation :post do
         operation :delete do
           key :description, 'Delete a specific survivor'
           key :produces, [
