@@ -36,6 +36,5 @@ FactoryGirl.define do
         create :inventory, survivor_id: ss.id
       end
     end
-
   end
 end

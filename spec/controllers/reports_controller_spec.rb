@@ -21,8 +21,7 @@ RSpec.describe ReportsController, type: :controller do
     it 'Return the percentage of infected persons' do
       create_survivors
       get :avg_infected
-      answer = JSON.parse(response.body).with_indifferent_access
-      expect(answer['percentage']).to eq(50.0)
+      expect(json_response['percentage']).to eq(50.0)
     end
   end
 
@@ -30,8 +29,7 @@ RSpec.describe ReportsController, type: :controller do
     it 'Return the percentage of no infected persons' do
       create_survivors
       get :avg_non_infected
-      answer = JSON.parse(response.body).with_indifferent_access
-      expect(answer['percentage']).to eq(50.0)
+      expect(json_response['percentage']).to eq(50.0)
     end
   end
 
@@ -39,11 +37,10 @@ RSpec.describe ReportsController, type: :controller do
     it 'Return average amount of each kind of resource by survivor' do
       create_survivors_with_resources
       get :avg_resource_per_person
-      answer = JSON.parse(response.body).with_indifferent_access
-      expect(answer['avg_ammunition']).to eq(0.5)
-      expect(answer['avg_medication']).to eq(0.5)
-      expect(answer['avg_food']).to eq(0.0)
-      expect(answer['avg_water']).to eq(0.0)
+      expect(json_response['avg_ammunition']).to eq(0.5)
+      expect(json_response['avg_medication']).to eq(0.5)
+      expect(json_response['avg_food']).to eq(0.0)
+      expect(json_response['avg_water']).to eq(0.0)
     end
   end
 
@@ -51,8 +48,7 @@ RSpec.describe ReportsController, type: :controller do
     it 'Return number of points lost because of infected survivor' do
       create_survivors_with_resources
       get :points_lost_infected
-      answer = JSON.parse(response.body).with_indifferent_access
-      expect(answer['number']).to eq(1)
+      expect(json_response['number']).to eq(1)
     end
   end
 end

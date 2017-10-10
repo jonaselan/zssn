@@ -7,9 +7,12 @@ System for help non-infected people to share resources
 * [Ruby](https://www.ruby-lang.org) (2.3.0 used)
 * [Rails](http://rubyonrails.org/)
 
-The application is deploy [here](https://jonaselan-zssn.herokuapp.com/api/survivors). But if you are using locally, is important fill the default resources after the `rails db:migration` and `bundle`. For do that,  run:
+The application is deploy [here](https://jonaselan-zssn.herokuapp.com/api/survivors). But if you are using locally, is important fill the default resources:
 
 ```
+bundle
+rails db:create
+rails db:migration
 rails db:seed
 ```
 
